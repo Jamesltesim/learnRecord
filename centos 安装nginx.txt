@@ -1,0 +1,33 @@
+
+添加Nginx存储库
+
+sudo yum install epel-release
+
+安装Nginx
+sudo yum install nginx
+
+启动Nginx
+sudo systemctl start nginx
+
+
+如果您正在运行防火墙，请运行以下命令以允许HTTP和HTTPS通信：
+ sudo firewall-cmd --permanent --zone=public --add-service=http 	  sudo firewall-cmd --permanent --zone=public --add-service=https sudo firewall-cmd --reload
+
+
+如果想在系统启动时启用Nginx。请输入以下命令：
+sudo systemctl enable nginx
+
+
+
+Nginx配置文件路径
+/etc/nginx/nginx.conf
+
+  Nginx重启
+nginx -s reload
+
+遇到的问题
+
+
+ngnix配置过程，遇到 ngxin is forbidden (13: Permission denied)
+
+setenforce 0
