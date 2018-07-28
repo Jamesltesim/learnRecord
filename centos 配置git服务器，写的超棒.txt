@@ -1,0 +1,69 @@
+centos 配置git服务器，写的超棒
+2018年01月18日 16:27:57
+阅读数：109
+这两天沉迷php web服务器开发不能自拔，但是php和html、js之类的程序要写一点看一点效果，我是放到linux云主机上测试的，所以要在xshell上写代码，很麻烦。
+
+于是想自己在云主机上搭建一个git远程仓库，这样我在windows端写代码，写好push一下就能在linux端同步更新，后来我发现我太天真了，因为linux端的git仓库不具备读写能力，里面的文件格式和我们上传上去的不一样，要想在linux端同步更新只能clone一下，然后手动pull更新，这样的话，还不如直接用github来管理。
+
+虽然最终目的是失败的，但是搭建git服务这个目标是成功的，我花了一天的时间，历经千辛万苦终于把git服务器给搭好了！
+
+下面放出全部流程：
+
+1. 安装git
+
+我用的是CentOS，所以直接用yum安装就好了，ubuntu系的用apt-get
+shell命令： $yum install git
+
+2. 增加一个git账户
+
+为了管理的方便，在linux下面增添一个 "git" 账户。
+shell命令： $adduser git
+我为了方便，顺便把这个账户放到sudoers组里面了（教程随手找了一个来： linux下将用户添加到sudoers中）
+
+3.创建一个git远程仓库
+
+此时进入/home/git（当然你可以自己另外指定用户文件夹）目录下面，创建一个叫做tmp.git的空git仓库
+shell命令： sudo git init --bare tmp.git 注意，仓库的名字后面要加上.git的后缀
+
+此时远程仓库已经建好了，这个仓库不能直接提取文件，只能通过clone的方式从里面下载文件，我一开始不知道，以为直接可以拿来用
+接下来要做的就是对ssh的配置
+
+4.配置ssh密钥
+
+我对原理不是很懂，简单来说就是客户端生成一个ssh公钥，然后把这个ssh公钥加到服务器端的一个文件里面，然后客户端就可以远程连接到服务器。
+因为这样就可以通过ssh远程登录服务器的shell了，这样肯定不安全，所以最好将git这个账号设置成不允许远程操控，我为了简便起见就没搞，再说我本来就是要远程登录linux的，这样做不是搬起石头砸了自己的脚。。。？
+一般说来，系统是自动安装好ssh相关软件的，如果没有自行安装一下：$yum install ssh ，    然后开启一下ssh服务：$service sshd restart
+废话不多说，先在git账号的目录下面找找看有没有 .ssh文件，没有的话建立一个新建一个 .ssh文件：$mkdir .ssh
+然后进入.ssh文件夹，在这个文件夹下面新建一个文件： touch authorized_keys
+然后要做的是把客户端生成的ssh密钥复制粘贴到这个文件里面。
+服务器端也是要生成密钥的，所以要执行：#ssh-keygen -t rsa生成两个文件（id.rsa和id.rsa.pub）
+
+我们随便找到一个linux系统（别问我我为什么有两个云主机大笑 ），然后执行这段命令：ssh-keygen -t rsa，如果你是一路回车确定下去的话，应该能看到下面这样的画面：
+ 
+进入.ssh文件夹，执行： $ls
+
+然后用cat命令查看id_rsa.pub文件: $cat id_rsa.pub
+
+然后将打印出来的这段密钥复制一下，就是这段 "ssh-rsa AAAAB3NzaC1yc2EAAAADAQA……oXZCu4jWwP git@iZ281a8bg82Z"，保存好这段文本。
+然后回到服务器端的git账号下的.ssh文件夹，打开之前新建好的authorized_keys文件夹，将刚才复制来的文本粘贴进去，一行一个密钥，一个密钥对应一个客户端
+
+5.客户端clone测试一下
+
+我们进入客户端主机（我用的是另一台云主机，也是linux系统的，如果是windows的话，需要下载git for windows版本的）。
+在用户目录下新建一个test文件夹用来存放等下要clone的仓库：
+
+进入test文件夹，执行：$git clone git@serveraddress:tmp.git
+这个时候我突然发现居然要输入服务器端git账户的登入密码，不对啊，这和我以前用github的画风不一样啊，于是我开始四处找教程，终于找到了原因：ssh配置文件的问题
+如果不需要输入密码就能成功clone的童鞋可以跳过下面这段。
+我们先登入服务器端的root权限账户，编辑/etc/ssh/sshd_config文件，这个文件是ssh服务器的配置文件，我们要修改的是这几行：
+
+
+（图上黄色的三项为 StrictModes no
+		RSAAuthentication yes
+		PubkeyAuthentication yes）
+找到上面这张图片中的那几段黄色语句，将其注释取消，再将属性修改成上面那样的。
+接下来千万别忘记重新启动一下ssh服务：$service sshd restart
+然后我再到客户端，执行clone命令，这次就不用输入密码了。
+
+这一路下来就算是大功告成了，只要想新增客户端，只要生成ssh密钥，然后把密钥复制到服务器端下的.ssh/authorized_keys文件下，客户端就可以连接上git远程仓库了。
+这个博客是给有一定基础linux基础和github使用经验的人看的。。。如果对文章感到疑惑，还是多多百度吧。。。

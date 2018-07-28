@@ -1,0 +1,45 @@
+我们经常会在普通用户下用到sudo命令，为了不用频繁切换root用户，我们可以将普通用户添加到sudoers里面。Linux默认是没有将用户添加到sudoers列表中的，需要root手动将账户添加到sudoers列表中，才能让普通账户执行sudo命令。下面以centOS6.9系统中的操作为列
+
+一.切换登录账户至root账户
+
+1.点击右上角用户名，点击下拉表中的switch user
+
+2.在切换用户界面，点击other
+
+3.输入root，接着输入密码，进入root用户
+
+二.在root用户下添加原来的普通用户进sudoers
+
+1.打开终端，键入visudo
+
+在出现的文本中，键入 /root ，寻找如下显示这行
+
+root    ALL=(ALL)      ALL
+
+找到如上显示这行后，将光标停在这行，键入yy来复制，然后键入p,会自动粘贴在下一行
+
+2.将光标停在复制的这一行的 root处，键入cw（表示要替换掉root），键入你所需要添加的账户名如：eric，结果就是如下显示
+
+root    ALL=(ALL)      ALL
+
+eric    ALL=(ALL)      ALL
+
+3.免密使用sudo
+
+如果你希望之后执行sudo命令时不需要输入密码，那么可以将上列复制的那行后面的ALL值前键入NOPASSWD:                 结果如下显示   
+
+root    ALL=(ALL)      ALL
+
+eric    ALL=(ALL)      NOPASSWD:ALL
+
+4.保存退出，编辑完成后，按下键盘上的esc,退出insert 模式，进入命令行模式
+
+然后键入：wq    即可保存退出
+
+5.切换回普通用户尝试执行sudo命令
+
+直接在命令前端键入sudo 空格即可，比如sudo shutdown -h now执行立即关机命令.
+
+注：如果用户不在sudoers列表中，将会得到以下提示.
+
+eric is not in the sudoers file.  This incident will be reported.
