@@ -1,0 +1,41 @@
+今天处理 ssh连接至 ubuntu 服务器时，提示以下错误：
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED! @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.
+The fingerprint for the RSA key sent by the remote host is
+da:f7:3e:ba:f7:00:e6:44:76:f2:58:6e:48:******.
+Please contact your system administrator.
+Add correct host key in /用户home目录/.ssh/known_hosts to get rid of this message.
+Offending RSA key in /用户home目录/.ssh/known_hosts:1
+RSA host key for ip地址 has changed and you have requested strict checking.
+Host key verification failed.
+经过google,出现这个问题的原因是,第一次使用SSH连接时，会生成一个认证，储存在客户端的known_hosts中。
+
+可使用以下指令查看：
+
+ssh-keygen -l -f ~/.ssh/known_hosts
+由于服务器重新安装系统了，所以会出现以上错误。
+
+解决办法
+
+ssh-keygen -R 服务器端的ip地址
+会出现以下提示：
+
+# Host 192.168.3.10 found: line 1 type RSA
+/用户home目录/.ssh/known_hosts updated.
+Original contents retained as /用户home目录/.ssh/known_hosts.old
+重新连线,出现以下提示：
+
+The authenticity of host '192.168.3.10 (192.168.3.10)' can't be established.
+RSA key fingerprint is da:f7:3e:ba:f7:00:e6:44:76:f2:58:6e:48:****.
+Are you sure you want to continue connecting (yes/no)?
+输入yes确认即可连线成功。
+
+作者：GkFool
+链接：https://www.jianshu.com/p/04328ed5970e
+來源：简书
+简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。

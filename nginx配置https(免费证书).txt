@@ -1,0 +1,89 @@
+nginx配置https(免费证书)
+2017年07月27日 14:19:57
+阅读数：6488
+一、我们需要什么证书
+
+之前写过一篇《tomcat https配置方法(免费证书)》的简书(想看的可以去我的主页里面看下,这两篇之间还是有许多相关联的知识的~),里面有提到过常用证书的分类,其中nginx使用的就是PEM格式的证书,我们将其拆分开就是需要两个文件,一个是.key文件,一个是.crt文件.
+
+二、怎样获取免费证书
+
+这里提供两个方法:
+
+第一种:如果你是windows用户,且有.keystore格式的证书
+
+那么你可以使用JKS2PFX转换工具,将你的keystore证书转换为PEM证书,操作方法为:cd到工具目录,然后运行命令:
+
+$ JKS2PFX
+
+第二种:如果你是Linux或者OSX系统
+
+生成秘钥key,运行:
+
+$ openssl genrsa -des3 -out server.key 2048
+1
+会有两次要求输入密码,输入同一个即可
+
+输入密码
+
+然后你就获得了一个server.key文件. 
+以后使用此文件(通过openssl提供的命令或API)可能经常回要求输入密码,如果想去除输入密码的步骤可以使用以下命令:
+
+$ openssl rsa -in server.key -out server.key
+1
+2
+创建服务器证书的申请文件server.csr,运行:
+
+openssl req -new -key server.key -out server.csr
+1
+2
+其中Country Name填CN,Common Name填主机名也可以不填,如果不填浏览器会认为不安全.(例如你以后的url为https://abcd/xxxx….这里就可以填abcd),其他的都可以不填. 
+创建CA证书:
+
+openssl req -new -x509 -key server.key -out ca.crt -days 3650
+1
+2
+此时,你可以得到一个ca.crt的证书,这个证书用来给自己的证书签名. 
+创建自当前日期起有效期为期十年的服务器证书server.crt：
+
+openssl x509 -req -days 3650 -in server.csr -CA ca.crt -CAkey server.key -CAcreateserial -out server.crt
+1
+2
+ls你的文件夹,可以看到一共生成了5个文件:
+
+ca.crt  ca.srl  server.crt server.csr server.key
+1
+2
+其中,server.crt和server.key就是你的nginx需要的证书文件. 
+三、如何配置nginx
+
+打开你的nginx配置文件,搜索443找到https的配置,去掉这段代码的注释.或者直接复制我下面的这段配置:
+
+server {
+
+  listen       443;
+     server_name  localhost;
+     ssl                  on;
+     ssl_certificate     /root/Lee/keys/server.crt;#配置证书位置
+     ssl_certificate_key  /root/Lee/keys/server.key;#配置秘钥位置
+     #ssl_client_certificate ca.crt;#双向认证
+     #ssl_verify_client on; #双向认证
+     ssl_session_timeout  5m;
+     ssl_protocols  SSLv2 SSLv3 TLSv1;
+     ssl_ciphers  ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
+     ssl_prefer_server_ciphers   on;
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+将ssl_certificate改为server.crt的路径,将ssl_certificate_key改为server.key的路径. 
+nginx -s reload 重载配置 
+至此,nginx的https就可以使用了,默认443端口.
