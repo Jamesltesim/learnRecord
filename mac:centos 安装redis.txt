@@ -1,0 +1,8 @@
+
+
+Mac: brew install redis
+
+Centos: yum install redis
+
+
+redis-server

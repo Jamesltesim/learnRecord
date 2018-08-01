@@ -1,0 +1,43 @@
+
+复制代码
+#!/bin/bash
+#########Centos7安装python3
+
+yum install wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gcc make -y
+
+
+wget https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tar.xz
+
+tar -xvJf Python-3.6.2.tar.xz
+
+cd Python-3.6.2
+
+./configure --prefix=/usr/local/python3
+
+make && make install
+
+cp /etc/profile /etc/profile.back
+
+# vi /etc/profile 
+
+#添加   export PATH="$PATH:/usr/local/python3/bin"
+
+# source /etc/profile
+
+cd /usr/bin/ && cp python python.bak
+
+ln -s /usr/local/python3/bin/python3.6 /usr/bin/python3
+
+
+
+#vi /usr/bin/yum
+
+#把  #! /usr/bin/python 修改为#! /usr/bin/python2
+
+# vi /usr/libexec/urlgrabber-ext-down
+
+# 把 #! /usr/bin/python 修改为 #! /usr/bin/python2
+
+python -V 
+
+python3 -V 

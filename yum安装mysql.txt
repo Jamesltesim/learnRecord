@@ -21,4 +21,33 @@ service mysqld start
 
 $ mysql -u root
 
+为root用户设置密码
+mysqladmin -u root password '123456'
+
+
+
+后期可能遇到的问题
+
+只能localhost登录 其他ip设备不能访问数据库的情况
+
+解决方案（包括1 和 2）
+1.需要在 mysql库的user表中插入 host = % user=root
+
+%	root	*6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y		0x	0x	0x	0	0	0	0	mysql_native_password		N
+
+2.防火墙开放 3306端口
+
+Centos 7 firewall 命令：
+查看已经开放的端口：
+firewall-cmd --list-ports
+
+开启端口
+firewall-cmd --zone=public --add-port=80/tcp --permanent
+
+重启防火墙
+firewall-cmd --reload #重启firewall
+systemctl stop firewalld.service #停止firewall
+systemctl disable firewalld.service #禁止firewall开机启动
+firewall-cmd --state #查看默认防火墙状态（关闭后显示notrunning，开启后显示running）
+
 
