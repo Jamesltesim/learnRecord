@@ -5,4 +5,24 @@ Mac: brew install redis
 Centos: yum install redis
 
 
-redis-server
+
+
+
+
+查看redis是否启动 service redis status
+
+
+redis-server  或者  service redis start
+
+
+5. 设置redis开机自启动
+
+# chkconfig --add redis
+
+# chkconfig redis on   开启开机启动
+
+# chkconfig redis off   关闭开机启动
+
+
+
+/etc/redis.conf 设置redis.conf中daemonize为yes,确保守护进程开启,也就是在后台可以运行.(设置为yes后,启动时好像没有redis的启动界面,不知道为什么)

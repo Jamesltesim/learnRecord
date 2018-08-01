@@ -10,19 +10,22 @@ $ sudo rpm -ivh mysql-community-release-el7-5.noarch.rpm
 
 3. 安装mysql
 
-$ sudo yum install mysql-server
+$ sudo yum install mysql-server -y
 根据步骤安装就可以了，不过安装完成后，没有密码，需要重置密码。
 
 service mysqld start
 
+
 4. 重置密码
-
-重置密码前，首先要登录
-
-$ mysql -u root
-
 为root用户设置密码
 mysqladmin -u root password '123456'
+
+5.要登录
+
+$ mysql -u root -p
+
+
+
 
 
 

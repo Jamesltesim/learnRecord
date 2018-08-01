@@ -19,8 +19,8 @@ sudo systemctl enable nginx
 
 
 
-Nginx配置文件路径
-/etc/nginx/nginx.conf
+Nginx配置文件路径 默认的文件使用权限是 nginx 需要修改
+/etc/nginx/nginx.conf.   
 
   Nginx重启
 nginx -s reload
@@ -31,3 +31,12 @@ nginx -s reload
 ngnix配置过程，遇到 ngxin is forbidden (13: Permission denied)
 
 setenforce 0
+
+
+
+
+
+
+-----------------------
+检查nginx启动进程
+ ps anx|grep nginx
