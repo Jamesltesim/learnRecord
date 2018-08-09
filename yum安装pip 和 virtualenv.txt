@@ -18,3 +18,5 @@ virtualenv -p /usr/bin/python3 py35env
 激活py35env虚拟环境：
 
 source py35env/bin/active 
+
+关闭 deactivate
