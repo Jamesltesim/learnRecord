@@ -26,3 +26,62 @@ redis-server  或者  service redis start
 
 
 /etc/redis.conf 设置redis.conf中daemonize为yes,确保守护进程开启,也就是在后台可以运行.(设置为yes后,启动时好像没有redis的启动界面,不知道为什么)
+
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------
+
+
+
+centOS6.3 安装redis make报错 zmalloc.h:50:31: 错误：jemalloc/jemalloc.h：没有那个文件或目录
+2017年01月08日 20:41:37
+阅读数：5276
+原因分析:
+
+在redis的解压包下有个README文件，打开这个文件 有这个一段话。
+
+llocator
+---------
+
+
+Selecting a non-default memory allocator when building Redis is done by setting
+the `MALLOC` environment variable. Redis is compiled and linked against libc
+malloc by default, with the exception of jemalloc being the default on Linux
+systems. This default was picked because jemalloc has proven to have fewer
+fragmentation problems than libc malloc.
+
+
+To force compiling against libc malloc, use:
+
+
+    % make MALLOC=libc
+
+
+To compile against jemalloc on Mac OS X systems, use:
+
+
+    % make MALLOC=jemalloc
+
+
+Verbose build
+-------------
+
+说的是关于分配器allocator， 如果有MALLOC  这个 环境变量， 会有用这个环境变量的 去建立Redis。
+
+而且libc 并不是默认的 分配器， 默认的是 jemalloc, 因为 jemalloc 被证明 有更少的 fragmentation problems 比libc。
+
+但是如果你又没有jemalloc 而只有 libc 当然 make 出错。 所以加这么一个参数。
+
+解决办法
+
+make MALLOC=libc
