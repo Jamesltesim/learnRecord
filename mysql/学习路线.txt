@@ -1,0 +1,5 @@
+1.创建复杂的表 100g数据
+
+2. 对表做优化
+下面链接 十篇文章概念要吃透
+https://blog.csdn.net/kingcat666/article/category/7033421
